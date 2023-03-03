@@ -68,7 +68,7 @@ impl EventHandler for Handler {
             vip_voice_state = guild.voice_states.get(&member.user.id);
         }
 
-        check_msg(channel_id.say(&ctx.http, "Los wird los fanfared!").await);
+        // check_msg(channel_id.say(&ctx.http, "Es wird los fanfared!").await);
 
         let uri = "D:/Songs/Hartgefetzt.ogg";
 

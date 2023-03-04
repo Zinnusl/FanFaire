@@ -70,7 +70,7 @@ impl EventHandler for Handler {
 
         // check_msg(channel_id.say(&ctx.http, "Es wird los fanfared!").await);
 
-        let uri = "D:/Songs/Hartgefetzt.ogg";
+        let uri = "D:/Songs/vocal_samples/voicemeter/Record 2023-03-04 at 00h14m20s.wav";
 
         let manager = songbird::get(&ctx).await
             .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -90,7 +90,11 @@ impl EventHandler for Handler {
                 },
             };
 
-            handler.play_source(source);
+            let _ = handler.play_source(source);
+
+            tokio::time::sleep(std::time::Duration::from_secs(8)).await;
+
+            let _ = handler.leave().await;
         }
     }
 }
@@ -121,7 +125,7 @@ async fn main() {
         let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
     });
     
-    tokio::signal::ctrl_c().await;
+    let _ = tokio::signal::ctrl_c().await;
     println!("Received Ctrl-C, shutting down.");
 }
 

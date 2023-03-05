@@ -34,15 +34,19 @@ use serenity::{
 struct Handler;
 
 const HELLNET_ID: u64 = 350723544495292426u64;
+const HELLNET_CHANNEL_ID: u64 = 350723544495292427u64;
+const HELLNET_VOICE_CHANNEL_ID: u64 = 767171780565139457u64;
+
 const TEST_ID: u64 = 1016319781084856442u64;
 const TEST_CHANNEL_ID: u64 = 1016319781844045888u64;
 const TEST_VOICE_CHANNEL_ID: u64 = 1016319781844045889u64;
 
-const GUILD_ID: u64 = TEST_ID;
-const GUILD_CHANNEL_ID: u64 = TEST_CHANNEL_ID;
-const GUILD_VOICE_CHANNEL_ID: u64 = TEST_VOICE_CHANNEL_ID;
+const GUILD_ID: u64 = HELLNET_ID;
+const GUILD_CHANNEL_ID: u64 = HELLNET_CHANNEL_ID;
+const GUILD_VOICE_CHANNEL_ID: u64 = HELLNET_VOICE_CHANNEL_ID;
 
-const VIP_ID: u64 = 242359196803268610u64;
+// const VIP_ID: u64 = 242359196803268610u64; // Zinnusl
+const VIP_ID: u64 = 666745883605467157u64; // Brie 666745883605467157
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -53,7 +57,7 @@ impl EventHandler for Handler {
         let guild_voice_channel_id = GUILD_VOICE_CHANNEL_ID;
 
         let channel = ctx.http.get_channel(guild_channel_id).await.unwrap();
-        let channel_id = channel.id();
+        let _channel_id = channel.id();
         let voice_channel = ctx.http.get_channel(guild_voice_channel_id).await.unwrap();
         let voice_channel_id = voice_channel.id();
 
@@ -70,7 +74,7 @@ impl EventHandler for Handler {
 
         // check_msg(channel_id.say(&ctx.http, "Es wird los fanfared!").await);
 
-        let uri = "D:/Songs/vocal_samples/voicemeter/Record 2023-03-04 at 00h14m20s.wav";
+        let uri = "D:/Songs/brie_fanfare/brie_fanfare.wav";
 
         let manager = songbird::get(&ctx).await
             .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -92,7 +96,7 @@ impl EventHandler for Handler {
 
             let _ = handler.play_source(source);
 
-            tokio::time::sleep(std::time::Duration::from_secs(8)).await;
+            tokio::time::sleep(std::time::Duration::from_secs(6)).await;
 
             let _ = handler.leave().await;
         }
@@ -111,8 +115,7 @@ async fn main() {
         .configure(|c| c
                    .prefix("~"));
 
-    let intents = GatewayIntents::non_privileged()
-        | GatewayIntents::MESSAGE_CONTENT;
+    let intents = GatewayIntents::GUILD_VOICE_STATES | GatewayIntents::GUILD_PRESENCES | GatewayIntents::GUILD_MEMBERS | GatewayIntents::GUILDS;
 
     let mut client = Client::builder(&token, intents)
         .event_handler(Handler)

@@ -37,9 +37,9 @@ const HELLNET_ID: u64 = 350723544495292426u64;
 const HELLNET_CHANNEL_ID: u64 = 350723544495292427u64;
 const HELLNET_VOICE_CHANNEL_ID: u64 = 767171780565139457u64;
 
-const TEST_ID: u64 = 1016319781084856442u64;
-const TEST_CHANNEL_ID: u64 = 1016319781844045888u64;
-const TEST_VOICE_CHANNEL_ID: u64 = 1016319781844045889u64;
+// const TEST_ID: u64 = 1016319781084856442u64;
+// const TEST_CHANNEL_ID: u64 = 1016319781844045888u64;
+// const TEST_VOICE_CHANNEL_ID: u64 = 813045208546934805u64;
 
 const GUILD_ID: u64 = HELLNET_ID;
 const GUILD_CHANNEL_ID: u64 = HELLNET_CHANNEL_ID;
@@ -62,43 +62,55 @@ impl EventHandler for Handler {
         let voice_channel_id = voice_channel.id();
 
         // Warten bis Brie im Voice Channel ist
-        let mut guild = ctx.cache.guild(guild_id).unwrap();
-        let member = guild.member(&ctx, VIP_ID).await.unwrap();
-        let mut vip_voice_state = guild.voice_states.get(&member.user.id);
-        while vip_voice_state.is_none() || vip_voice_state.unwrap().channel_id.unwrap() != voice_channel_id {
-            println!("Waiting for Zinnusl to join the voice channel..., {}", vip_voice_state.is_none());
-            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-            guild = ctx.cache.guild(guild_id).unwrap();
-            vip_voice_state = guild.voice_states.get(&member.user.id);
-        }
+        loop {
+            let mut guild = ctx.cache.guild(guild_id).unwrap();
+            let member = guild.member(&ctx, VIP_ID).await.unwrap();
+            let mut vip_voice_state = guild.voice_states.get(&member.user.id);
+            let mut is_not_in_voice_channel = vip_voice_state.is_none() || vip_voice_state.unwrap().channel_id.unwrap() != voice_channel_id;
+            while !is_not_in_voice_channel {
+                println!("Waiting for Brie to leaeve the voice channel..., {}", vip_voice_state.is_none());
+                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                guild = ctx.cache.guild(guild_id).unwrap();
+                vip_voice_state = guild.voice_states.get(&member.user.id);
+                is_not_in_voice_channel = vip_voice_state.is_none() || vip_voice_state.unwrap().channel_id.unwrap() != voice_channel_id;
+            }
+            is_not_in_voice_channel = vip_voice_state.is_none() || vip_voice_state.unwrap().channel_id.unwrap() != voice_channel_id;
+            while is_not_in_voice_channel {
+                println!("Waiting for Brie to join the voice channel..., {}", vip_voice_state.is_none());
+                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                guild = ctx.cache.guild(guild_id).unwrap();
+                vip_voice_state = guild.voice_states.get(&member.user.id);
+                is_not_in_voice_channel = vip_voice_state.is_none() || vip_voice_state.unwrap().channel_id.unwrap() != voice_channel_id;
+            }
 
-        // check_msg(channel_id.say(&ctx.http, "Es wird los fanfared!").await);
+            // check_msg(channel_id.say(&ctx.http, "Es wird los fanfared!").await);
 
-        let uri = "D:/Songs/brie_fanfare/brie_fanfare.wav";
+            let uri = "D:/Songs/brie_fanfare/brie_fanfare.wav";
 
-        let manager = songbird::get(&ctx).await
-            .expect("Songbird Voice client placed in at initialisation.").clone();
+            let manager = songbird::get(&ctx).await
+                .expect("Songbird Voice client placed in at initialisation.").clone();
 
-        let _handler = manager.join(guild_id, voice_channel_id).await;
+            let _handler = manager.join(guild_id, voice_channel_id).await;
 
-        if let Some(handler_lock) = manager.get(guild_id) {
-            let mut handler = handler_lock.lock().await;
+            if let Some(handler_lock) = manager.get(guild_id) {
+                let mut handler = handler_lock.lock().await;
 
-            let source = match songbird::ffmpeg(&uri).await {
-                Ok(source) => source,
-                Err(why) => {
-                    println!("Err starting source: {:?}", why);
+                let source = match songbird::ffmpeg(&uri).await {
+                    Ok(source) => source,
+                    Err(why) => {
+                        println!("Err starting source: {:?}", why);
 
-                    check_msg(channel.id().say(&ctx.http, "Error sourcing ffmpeg").await);
-                    return ();
-                },
-            };
+                        check_msg(channel.id().say(&ctx.http, "Error sourcing ffmpeg").await);
+                        return ();
+                    },
+                };
 
-            let _ = handler.play_source(source);
+                let _ = handler.play_source(source);
 
-            tokio::time::sleep(std::time::Duration::from_secs(6)).await;
+                tokio::time::sleep(std::time::Duration::from_secs(6)).await;
 
-            let _ = handler.leave().await;
+                let _ = handler.leave().await;
+            }
         }
     }
 }

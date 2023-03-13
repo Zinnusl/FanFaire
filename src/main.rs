@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 //! Requires the "client", "standard_framework", and "voice" features be enabled in your
 //! Cargo.toml, like so:
 //!
@@ -46,7 +48,8 @@ const GUILD_CHANNEL_ID: u64 = HELLNET_CHANNEL_ID;
 const GUILD_VOICE_CHANNEL_ID: u64 = HELLNET_VOICE_CHANNEL_ID;
 
 // const VIP_ID: u64 = 242359196803268610u64; // Zinnusl
-const VIP_ID: u64 = 666745883605467157u64; // Brie 666745883605467157
+const VIP_ID: u64 = 666745883605467157u64; // Brie
+// const VIP_ID: u64 = 331097633961672706u64; // Fiona
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -118,7 +121,7 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    
+
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
